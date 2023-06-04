@@ -17,7 +17,4 @@ def VAR(df, max_order=15, return_model=False):
     # Create pandas DataFrame
     df_gen = pd.DataFrame(ts_gen, columns=df.columns,
                           index=df.index[-len(ts_gen):])
-    if return_model:
-        return df_gen, model
-    else:
-        return df_gen
+    return (df_gen, model) if return_model else df_gen

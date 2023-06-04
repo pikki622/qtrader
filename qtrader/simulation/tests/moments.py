@@ -28,10 +28,12 @@ class Moments(Test):
         # forth order moment test
         forth_order = cls._forth_order_test(
             df_1, df_2, log, render)
-        # summary of tests and scores
-        info = {'first': first_order, 'second': second_order,
-                'third': third_order, 'forth': forth_order}
-        return info
+        return {
+            'first': first_order,
+            'second': second_order,
+            'third': third_order,
+            'forth': forth_order,
+        }
 
     @classmethod
     def _first_order_test(cls, df_1, df_2, tolerance, render):
@@ -71,19 +73,22 @@ class Moments(Test):
         mode_1 = df_1.mode(axis=0).iloc[0]
         mode_2 = df_2.mode(axis=0).iloc[0]
         dmode = np.abs((mode_1+eps) / (mode_2+eps) - 1)
-        # summary table for each ticker
-        summary = {}
-        # iterate over tickers
-        for ticker in df_1:
-            # summary table columns
-            _name1 = 'series 1'
-            _name2 = 'series 2'
-            _name3 = 'deviations'
-            summary[ticker] = pd.DataFrame({_name1: [mu_1[ticker], median_1[ticker], mode_1[ticker]],
-                                            _name2: [mu_2[ticker], median_2[ticker], mode_1[ticker]],
-                                            _name3: [dmu[ticker], dmedian[ticker], dmode[ticker]]},
-                                           columns=[_name1, _name2, _name3],
-                                           index=['mean', 'median', 'mode'])
+        # summary table columns
+        _name1 = 'series 1'
+        _name2 = 'series 2'
+        _name3 = 'deviations'
+        summary = {
+            ticker: pd.DataFrame(
+                {
+                    _name1: [mu_1[ticker], median_1[ticker], mode_1[ticker]],
+                    _name2: [mu_2[ticker], median_2[ticker], mode_1[ticker]],
+                    _name3: [dmu[ticker], dmedian[ticker], dmode[ticker]],
+                },
+                columns=[_name1, _name2, _name3],
+                index=['mean', 'median', 'mode'],
+            )
+            for ticker in df_1
+        }
         # print summary
         if log:
             for ticker, summ in summary.items():
@@ -100,34 +105,80 @@ class Moments(Test):
                 ncols=len(I), nrows=2, sharex=True, figsize=(6.4 * len(I), 4.8))
             for i, m in enumerate(I):
                 # distribution plot of family 1
-                sns.distplot(df_1.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='g', norm_hist=True, ax=axes[0, i])
+                sns.distplot(
+                    df_1.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='g',
+                    norm_hist=True,
+                    ax=axes[0, i],
+                )
                 # distribution plot of family 2
-                sns.distplot(df_2.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='r', norm_hist=True, ax=axes[1, i])
+                sns.distplot(
+                    df_2.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='r',
+                    norm_hist=True,
+                    ax=axes[1, i],
+                )
                 # y-axis limits
                 ymin_1, ymax_1 = axes[0, i].get_ylim()
                 ymin_2, ymax_2 = axes[1, i].get_ylim()
                 ymin = min(ymin_1, ymin_2)
                 ymax = max(ymax_1, ymax_2)
                 # vertical line for mean of family 1
-                axes[0, i].vlines(mu_1.iloc[m], ymin, ymax, label='%s::mean' %
-                                  df_1.columns[m], color='g', linestyles='-')
+                axes[0, i].vlines(
+                    mu_1.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_1.columns[m]}::mean',
+                    color='g',
+                    linestyles='-',
+                )
                 # vertical line for median of family 1
-                axes[0, i].vlines(median_1.iloc[m], ymin, ymax, label='%s::median' %
-                                  df_1.columns[m], color='g', linestyles='-.')
+                axes[0, i].vlines(
+                    median_1.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_1.columns[m]}::median',
+                    color='g',
+                    linestyles='-.',
+                )
                 # vertical line for mode of family 1
-                axes[0, i].vlines(mode_1.iloc[m], ymin, ymax, label='%s::mode' %
-                                  df_1.columns[m], color='g', linestyles='--')
+                axes[0, i].vlines(
+                    mode_1.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_1.columns[m]}::mode',
+                    color='g',
+                    linestyles='--',
+                )
                 # vertical line for mean of family 2
-                axes[1, i].vlines(mu_2.iloc[m], ymin, ymax, label='%s::mean' %
-                                  df_2.columns[m], color='r', linestyles='-')
+                axes[1, i].vlines(
+                    mu_2.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_2.columns[m]}::mean',
+                    color='r',
+                    linestyles='-',
+                )
                 # vertical line for median of family 2
-                axes[1, i].vlines(median_2.iloc[m], ymin, ymax, label='%s::median' %
-                                  df_2.columns[m], color='r', linestyles='-.')
+                axes[1, i].vlines(
+                    median_2.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_2.columns[m]}::median',
+                    color='r',
+                    linestyles='-.',
+                )
                 # vertical line for mode of family 2
-                axes[1, i].vlines(mode_2.iloc[m], ymin, ymax, label='%s::mode' %
-                                  df_2.columns[m], color='r', linestyles='--')
+                axes[1, i].vlines(
+                    mode_2.iloc[m],
+                    ymin,
+                    ymax,
+                    label=f'{df_2.columns[m]}::mode',
+                    color='r',
+                    linestyles='--',
+                )
                 # setting for family 1
                 axes[0, i].set(ylabel='Frequency',
                                xlabel='', ylim=[ymin, ymax])
@@ -176,7 +227,7 @@ class Moments(Test):
         # relative deviation of covariances
         # normalized by frobenius norms
         dcov = np.linalg.norm(cov_1 - cov_2, ord='fro') / \
-            (np.sqrt(fro_1) * np.sqrt(fro_2) + eps)
+                (np.sqrt(fro_1) * np.sqrt(fro_2) + eps)
         # column-wise std values
         std_1 = df_1.std(axis=0)
         std_2 = df_2.std(axis=0)
@@ -184,6 +235,12 @@ class Moments(Test):
         dstd = np.abs((std_1+eps) / (std_2+eps) - 1)
         # summary table for each ticker
         summary = {}
+        # summary table columns
+        _name1 = 'series 1'
+        _name2 = 'series 2'
+        _name3 = 'deviations'
+        _name4 = 'statistic'
+        _name5 = 'p-value (>0.05)'
         # iterate over tickers
         for ticker in df_1:
             # Bartlett test
@@ -194,12 +251,6 @@ class Moments(Test):
             # Fligner-Killeen test
             fligner_s, fligner_p = scipy.stats.fligner(
                 df_1[ticker], df_2[ticker])
-            # summary table columns
-            _name1 = 'series 1'
-            _name2 = 'series 2'
-            _name3 = 'deviations'
-            _name4 = 'statistic'
-            _name5 = 'p-value (>0.05)'
             summary[ticker] = pd.DataFrame({_name1: [std_1[ticker], None, None, None],
                                             _name2: [std_2[ticker], None, None, None],
                                             _name3: [dstd[ticker], None, None, None],
@@ -276,16 +327,16 @@ class Moments(Test):
         dskew = np.abs((skew_1+eps) / (skew_2+eps) - 1)
         # summary table for each ticker
         summary = {}
+        # summary table columns
+        _name1 = 'series 1'
+        _name2 = 'series 2'
+        _name3 = 'deviations'
         # iterate over tickers
         for ticker in df_1:
             # Skewness test for family 1
             skewtest_s_1, skewtest_p_1 = scipy.stats.skewtest(df_1[ticker])
             # Skewness test for family 2
             skewtest_s_2, skewtest_p_2 = scipy.stats.skewtest(df_2[ticker])
-            # summary table columns
-            _name1 = 'series 1'
-            _name2 = 'series 2'
-            _name3 = 'deviations'
             summary[ticker] = pd.DataFrame({_name1: [skew_1[ticker], skewtest_s_1, skewtest_p_1],
                                             _name2: [skew_2[ticker], skewtest_s_2, skewtest_p_2],
                                             _name3: [dskew[ticker], None, None]},
@@ -314,8 +365,13 @@ class Moments(Test):
                 sns.distplot(norm_1, label='$\mathcal{N}(%.4f, %.4f)$' %
                              (mu_1, std_1), color='k', norm_hist=True, ax=axes[0, i])
                 # distribution plot of family 1
-                sns.distplot(df_1.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='g', norm_hist=True, ax=axes[0, i])
+                sns.distplot(
+                    df_1.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='g',
+                    norm_hist=True,
+                    ax=axes[0, i],
+                )
                 # normal distribution with family 2's statistics
                 mu_2 = df_2.iloc[:, m].mean()
                 std_2 = df_2.iloc[:, m].std()
@@ -324,8 +380,13 @@ class Moments(Test):
                 sns.distplot(norm_2, label='$\mathcal{N}(%.4f, %.4f)$' %
                              (mu_2, std_2), color='k', norm_hist=True, ax=axes[1, i])
                 # distribution plot of family 2
-                sns.distplot(df_2.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='r', norm_hist=True, ax=axes[1, i])
+                sns.distplot(
+                    df_2.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='r',
+                    norm_hist=True,
+                    ax=axes[1, i],
+                )
                 # y-axis limits
                 ymin_1, ymax_1 = axes[0, i].get_ylim()
                 ymin_2, ymax_2 = axes[1, i].get_ylim()
@@ -375,6 +436,10 @@ class Moments(Test):
         dkurt = np.abs((kurt_1+eps) / (kurt_2+eps) - 1)
         # summary table for each ticker
         summary = {}
+        # summary table columns
+        _name1 = 'series 1'
+        _name2 = 'series 2'
+        _name3 = 'deviations'
         # iterate over tickers
         for ticker in df_1:
             # Kurtosis test for family 1
@@ -383,10 +448,6 @@ class Moments(Test):
             # Kurtosis test for family 2
             kurtosistest_s_2, kurtosistest_p_2 = scipy.stats.kurtosistest(
                 df_2[ticker])
-            # summary table columns
-            _name1 = 'series 1'
-            _name2 = 'series 2'
-            _name3 = 'deviations'
             summary[ticker] = pd.DataFrame({_name1: [kurt_1[ticker], kurtosistest_s_1, kurtosistest_p_1],
                                             _name2: [kurt_2[ticker], kurtosistest_s_2, kurtosistest_p_2],
                                             _name3: [dkurt[ticker], None, None]},
@@ -415,8 +476,13 @@ class Moments(Test):
                 sns.distplot(norm_1, label=r'$\mathcal{N}(%.4f, %.4f)$' %
                              (mu_1, std_1), color='k', norm_hist=True, ax=axes[0, i])
                 # distribution plot of family 1
-                sns.distplot(df_1.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='g', norm_hist=True, ax=axes[0, i])
+                sns.distplot(
+                    df_1.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='g',
+                    norm_hist=True,
+                    ax=axes[0, i],
+                )
                 # normal distribution with family 2's statistics
                 mu_2 = df_2.iloc[:, m].mean()
                 std_2 = df_2.iloc[:, m].std()
@@ -425,8 +491,13 @@ class Moments(Test):
                 sns.distplot(norm_2, label=r'$\mathcal{N}(%.4f, %.4f)$' %
                              (mu_2, std_2), color='k', norm_hist=True, ax=axes[1, i])
                 # distribution plot of family 2
-                sns.distplot(df_2.iloc[:, m], label='%s' %
-                             df_1.columns[m], color='r', norm_hist=True, ax=axes[1, i])
+                sns.distplot(
+                    df_2.iloc[:, m],
+                    label=f'{df_1.columns[m]}',
+                    color='r',
+                    norm_hist=True,
+                    ax=axes[1, i],
+                )
                 # y-axis limits
                 ymin_1, ymax_1 = axes[0, i].get_ylim()
                 ymin_2, ymax_2 = axes[1, i].get_ylim()

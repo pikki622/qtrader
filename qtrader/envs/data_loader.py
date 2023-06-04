@@ -41,9 +41,9 @@ class Finance:
             Market data for `ticker`.
         """
         try:
-            return quandl.get('WIKI/%s' % ticker, **kwargs)
+            return quandl.get(f'WIKI/{ticker}', **kwargs)
         except:
-            logger.warn('failed to fetch market data for %s' % ticker)
+            logger.warn(f'failed to fetch market data for {ticker}')
             return None
 
     @classmethod
@@ -133,17 +133,16 @@ class Finance:
         """
         if isinstance(csv, str):
             return cls._csv(csv, tickers).loc[start_date:end_date]
-        else:
-            # tmp dictionary of panda.Series
-            data = {}
-            for i, ticker in enumerate(tickers):
-                tmp_df = cls._get(
-                    ticker, start_date=start_date, end_date=end_date)
-                # successful data fetchinf
-                if tmp_df is not None:
-                    data[ticker] = tmp_df[cls._col]
-            # dict to pandas.DataFrame
-            df = pd.DataFrame(data)
+        # tmp dictionary of panda.Series
+        data = {}
+        for ticker in tickers:
+            tmp_df = cls._get(
+                ticker, start_date=start_date, end_date=end_date)
+            # successful data fetchinf
+            if tmp_df is not None:
+                data[ticker] = tmp_df[cls._col]
+        # dict to pandas.DataFrame
+        df = pd.DataFrame(data)
         return df.sort_index(ascending=True).resample(freq).last()
 
     @classmethod
@@ -209,10 +208,7 @@ class VAR:
         """
         df = clean(Finance.Returns(tickers, start_date, end_date, freq, csv))
         sim_df, model = _VAR(df, model_order, True)
-        if return_params:
-            return sim_df, model.params
-        else:
-            return sim_df
+        return (sim_df, model.params) if return_params else sim_df
 
     @classmethod
     def Prices(cls,
@@ -258,7 +254,4 @@ class VAR:
                                   end_date, freq, csv,
                                   model_order, return_params)
         prices = (clean(returns) + 1).cumprod()
-        if return_params:
-            return prices, params
-        else:
-            return prices
+        return (prices, params) if return_params else prices

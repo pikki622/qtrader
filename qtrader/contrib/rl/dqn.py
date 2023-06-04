@@ -50,9 +50,8 @@ class DQNAgent:
     def get_action(self, state):
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
-        else:
-            q_value = self.model.predict(state)
-            return np.argmax(q_value[0])
+        q_value = self.model.predict(state)
+        return np.argmax(q_value[0])
 
     def append_sample(self, state, action, reward, next_state, done):
         self.memory.append((state, action, reward, next_state, done))

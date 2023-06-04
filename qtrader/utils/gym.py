@@ -116,7 +116,7 @@ def run(env: Env, agent,
             # set new observation to current
             ob = ob_
             # increment iterator
-            j = j + 1
+            j += 1
         # agent closure: end of episode
         agent.end_episode()
         return _rewards, _actions
@@ -144,8 +144,8 @@ def run(env: Env, agent,
             # store agent state
             if hasattr(agent, 'save'):
                 # create folder if not there
-                if not os.path.exists('tmp/models/%s' % agent.name):
-                    os.makedirs('tmp/models/%s' % agent.name)
+                if not os.path.exists(f'tmp/models/{agent.name}'):
+                    os.makedirs(f'tmp/models/{agent.name}')
                 # store weights
                 agent.save('tmp/models/%s/%f.h5' % (agent.name, _best_reward))
 

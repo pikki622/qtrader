@@ -24,7 +24,7 @@ def time_series(series, title='', xlabel='', ylabel='', path=None):
         Path to store figure.
     """
     fig, ax = plt.subplots()
-    if isinstance(series, pd.DataFrame) or isinstance(series, pd.Series):
+    if isinstance(series, (pd.DataFrame, pd.Series)):
         series.plot(ax=ax)
     elif isinstance(series, np.ndarray):
         if series.ndim == 1:
@@ -79,8 +79,10 @@ def trades(prices, weights, path=None):
         'height_ratios': [3, 1], 'wspace': 0.01})
     axes[0].plot(prices.index, prices.values, color='b')
     axes[1].bar(weights.index, weights.values, color='g')
-    axes[0].set(title='%s: Prices & Portfolio Weights' % (prices.name or 'Strategy'),
-                ylabel='Price, $p_{t}$')
+    axes[0].set(
+        title=f"{prices.name or 'Strategy'}: Prices & Portfolio Weights",
+        ylabel='Price, $p_{t}$',
+    )
     axes[1].set(xlabel='Time', ylabel='Weight, $w_{t}$', ylim=[0, 1])
     axes[1].xaxis.set_tick_params(rotation=45)
     fig.subplots_adjust(hspace=.0)

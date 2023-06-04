@@ -24,7 +24,6 @@ def AAFT(df, random=np.random.uniform, random_state=None):
         F_tsi_new = F_tsi * rv_phase
         # Inverse Fourier Transformation
         ts_gen[:, i] = np.fft.irfft(F_tsi_new)
-    # Create pandas DataFrame
-    df_gen = pd.DataFrame(ts_gen, columns=df.columns,
-                          index=df.index[-len(ts_gen):])
-    return df_gen
+    return pd.DataFrame(
+        ts_gen, columns=df.columns, index=df.index[-len(ts_gen) :]
+    )

@@ -37,6 +37,4 @@ def sinewaves(A: np.ndarray,
     # datetime indexes
     index = pd.date_range(end=datetime.date.today(),
                           freq=freq, periods=num_samples)
-    # pandas compatible data
-    df = pd.DataFrame(y, columns=tickers, index=index)
-    return df
+    return pd.DataFrame(y, columns=tickers, index=index)

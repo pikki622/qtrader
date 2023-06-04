@@ -35,7 +35,7 @@ class PortfolioVector(gym.Space):
         return self.low.shape
 
     def __repr__(self):
-        return "PortfolioVector" + str(self.shape)
+        return f"PortfolioVector{str(self.shape)}"
 
     def __eq__(self, other):
         return np.allclose(self.low, other.low) and \

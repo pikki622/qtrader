@@ -37,12 +37,7 @@ def stats(returns):
         'Average Win to Average Loss': qtrader.utils.econometric.awal(returns),
         'Average Profitability Per Trade': qtrader.utils.econometric.appt(returns)
     }
-    table = pd.Series(
-        report,
-        name=(returns.name or 'Strategy'),
-        dtype=object
-    )
-    return table
+    return pd.Series(report, name=(returns.name or 'Strategy'), dtype=object)
 
 
 def figure(prices, returns, weights, path=None):

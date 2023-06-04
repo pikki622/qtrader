@@ -141,8 +141,7 @@ def drawdown(returns):
     """
     _cum_returns = cum_returns(returns)
     expanding_max = _cum_returns.expanding(1).max()
-    drawdown = expanding_max - _cum_returns
-    return drawdown
+    return expanding_max - _cum_returns
 
 
 def _drawdown(returns):

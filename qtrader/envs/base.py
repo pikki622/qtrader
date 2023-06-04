@@ -146,10 +146,10 @@ class BaseEnv(gym.Env):
         raise NotImplementedError
 
     def _get_observation(self) -> object:
-        ob = {}
-        ob['prices'] = self._prices.loc[self.index, :]
-        ob['returns'] = self._returns.loc[self.index, :]
-        return ob
+        return {
+            'prices': self._prices.loc[self.index, :],
+            'returns': self._returns.loc[self.index, :],
+        }
 
     def _get_reward(self, action) -> pd.Series:
         return self._returns.loc[self.index] * action
@@ -232,9 +232,7 @@ class BaseEnv(gym.Env):
         for name, A in action.items():
             # action validity check
             if not self.action_space.contains(A):
-                raise ValueError(
-                    'invalid `action` attempted: %s' % (A)
-                )
+                raise ValueError(f'invalid `action` attempted: {A}')
             # actions buffer
             self.agents[name].actions.loc[self.index] = A
             self.agents[name].rewards.loc[self.index] = self._get_reward(A)
@@ -253,9 +251,7 @@ class BaseEnv(gym.Env):
         self._validate_agents()
         # set time to zero
         self._counter = 0
-        # get initial observation
-        ob = self._get_observation()
-        return ob
+        return self._get_observation()
 
     def render(self) -> None:
         """Graphical interface of environment."""
